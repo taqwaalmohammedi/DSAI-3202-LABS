@@ -1,6 +1,5 @@
 import multiprocessing
-import time  # Make sure to import time module
-from src.functions import generate_random_chars, generate_random_sum
+import time  # Ensure time module is imported
 
 # Function to wrap each task in a process
 def process_function(func, *args):
@@ -8,9 +7,11 @@ def process_function(func, *args):
 
 # Function to run the processes task
 def run_processes():
+    from src.functions import generate_random_chars, generate_random_sum  # Import inside function
+
     # Start processes for both tasks
     process1 = multiprocessing.Process(target=process_function, args=(generate_random_chars,))
-    process2 = multiprocessing.Process(target=process_function, args=(generate_random_sum,))
+    process2 = multiprocessing.Process(target=process_function, args=(generate_random_sum, 2, 3))  # Pass args correctly
     
     # Run the processes
     start_time = time.time()  # Measure start time
