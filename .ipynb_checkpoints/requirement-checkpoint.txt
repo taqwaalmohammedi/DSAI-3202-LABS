@@ -1,3 +1,1 @@
-andas
-scikit-learn
 pytest
