@@ -1,16 +1,25 @@
-from sklearn.ensemble import RandomForestClassifier
+import multiprocessing
+import time  # Make sure to import time module
+from src.functions import generate_random_chars, generate_random_sum
 
-def train_model(X_train, y_train):
-    """
-    Trains a RandomForestClassifier on the given training data.
+# Function to wrap each task in a process
+def process_function(func, *args):
+    return func(*args)
 
-    Args:
-        X_train (pandas.DataFrame): The training features.
-        y_train (pandas.Series): The training labels.
+# Function to run the processes task
+def run_processes():
+    # Start processes for both tasks
+    process1 = multiprocessing.Process(target=process_function, args=(generate_random_chars,))
+    process2 = multiprocessing.Process(target=process_function, args=(generate_random_sum,))
+    
+    # Run the processes
+    start_time = time.time()  # Measure start time
+    process1.start()
+    process2.start()
 
-    Returns:
-        RandomForestClassifier: The trained model.
-    """
-    model = RandomForestClassifier(random_state=42)  # Initializes the model
-    model.fit(X_train, y_train)  # Trains the model
-    return model  # Returns the trained model
+    # Wait for both processes to finish
+    process1.join()
+    process2.join()
+    
+    end_time = time.time()  # Measure end time
+    print(f"Time to execute using processes: {end_time - start_time} seconds.")
