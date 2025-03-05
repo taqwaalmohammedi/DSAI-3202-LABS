@@ -9,4 +9,4 @@ def simulate_sensor(sensor_id):
         temp = random.randint(15, 40)
         with lock:
             latest_temperatures[sensor_id] = temp
-        time.sleep(1)
+        time.sleep(1)  
