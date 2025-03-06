@@ -1,8 +1,9 @@
 numpy
 pandas
-scikit-learn
-scikit-image
-matplotlib
-seaborn
 opencv-python
+scipy
+scikit-image
+scikit-learn
 concurrent.futures
+matplotlib
+tqdm

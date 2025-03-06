@@ -1,22 +1,37 @@
-from preprocessing import load_images
-from feature_extraction import extract_glcm_features
-from parallel_processing import process_images_parallel
-from model_training import train_all_models
+from src.data_loader import load_images
+from src.filters import process_images_parallel
+from src.features import extract_features_parallel
+from src.model_training import train_and_evaluate_models
 import pandas as pd
+import glob
 
-# Load dataset
-dataset_path = "dataset_path_here"
-images = load_images(dataset_path)
+dataset_path = "../data/"
 
-# Process images in parallel
-processed_images = process_images_parallel(images)
 
-# Extract features
-features = [extract_glcm_features(img['Original']) for img in processed_images]
-df = pd.DataFrame(features)
-df['Tumor'] = [1] * len(features)  # Update with actual labels
+yes_image_paths = glob.glob(dataset_path + "yes/*.*")
+no_image_paths = glob.glob(dataset_path + "no/*.*")
 
-# Train models
-trained_models, X_test, y_test = train_all_models(df.drop(columns=['Tumor']), df['Tumor'])
 
-print("Pipeline Completed Successfully!")
+yes_images = load_images(yes_image_paths)
+no_images = load_images(no_image_paths)
+
+
+print(f"Number of Yes Images: {len(yes_images)}")
+print(f"Number of No Images: {len(no_images)}")
+
+if len(yes_images) == 0 or len(no_images) == 0:
+    print("Error: No images were loaded. Check the dataset path and image format.")
+else:
+    
+    yes_inputs = process_images_parallel(yes_images)
+    no_inputs = process_images_parallel(no_images)
+
+  
+    yes_glcm_features = extract_features_parallel(yes_inputs, 1)
+    no_glcm_features = extract_features_parallel(no_inputs, 0)
+
+    df = pd.DataFrame(yes_glcm_features + no_glcm_features)
+    df.to_csv("brain_tumor_features_parallel.csv", index=False)
+    print("Feature extraction completed and saved.")
+
+    train_and_evaluate_models("brain_tumor_features_parallel.csv")
