@@ -1,31 +1,22 @@
-import threading
-import time
-from src.sensor_simulation import *
-from src.data_processing import *
-from src.display_logic import *
+from preprocessing import load_images
+from feature_extraction import extract_glcm_features
+from parallel_processing import process_images_parallel
+from model_training import train_all_models
+import pandas as pd
 
-# Initialize display
-initialize_display()
+# Load dataset
+dataset_path = "dataset_path_here"
+images = load_images(dataset_path)
 
-# Create sensor threads
-sensor_threads = [threading.Thread(target=simulate_sensor, args=(i,), daemon=True) for i in range(3)]
+# Process images in parallel
+processed_images = process_images_parallel(images)
 
-# Create data processing thread
-processing_thread = threading.Thread(target=process_temperatures, daemon=True)
+# Extract features
+features = [extract_glcm_features(img['Original']) for img in processed_images]
+df = pd.DataFrame(features)
+df['Tumor'] = [1] * len(features)  # Update with actual labels
 
-# Create display update thread (refresh every 5s)
-display_thread = threading.Thread(target=update_display, daemon=True)
+# Train models
+trained_models, X_test, y_test = train_all_models(df.drop(columns=['Tumor']), df['Tumor'])
 
-# Start all threads
-for thread in sensor_threads:
-    thread.start()
-
-processing_thread.start()
-display_thread.start()
-
-# Keep the main thread running
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("\nStopping simulation.")
+print("Pipeline Completed Successfully!")
