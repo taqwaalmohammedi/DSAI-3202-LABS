@@ -1,24 +1,49 @@
-README.md
-# DSAI 3202 - Lab 6: Parallel and Distributed Computing (Fallback Version)
+Parallel and Distributed Computing - Assignment 1
+Course: DSAI 3202
+Author: Taqwa Almohammedi
+Date: 19/3/2024
 
-## Group Members:
-- Dima (10.102.1.67)
-- Asma (10.102.0.)
-- Lena (10.102.0.)
+1. Introduction
+This project explores multiprocessing and process synchronization in Python.
+It contains two implementations:
 
-## Description:
-This Lab 6 submission includes a fallback implementation of the two required tasks using Python's multiprocessing module instead of mpi4py, due to persistent environment issues.
+square_program.py – Computes squares of numbers using different parallel techniques.
+connection_pool.py – Simulates a database connection pool using semaphores to control access.
+2. Requirements
+Python 3.8+
+No external dependencies (only standard Python libraries)
+3. How to Run
+A. Running the Square Program
+bash
+Copy
+Edit
+python square_program.py
+This script:
 
-## Files Included:
-- calculate_squares_mp.py: Parallel square number calculator.
-- virus_simulation_mp.py: Parallel virus spread simulation.
-- requirements.txt: Minimal required dependency (numpy).
+Generates a list of random numbers.
+Computes their squares using:
+Sequential processing
+Multiprocessing (apply, map, apply_async)
+concurrent.futures.ProcessPoolExecutor
+Measures and compares execution times.
+B. Running the Connection Pool Program
+bash
+Copy
+Edit
+python connection_pool.py
+This script:
 
-## How to Run:
-1. Install the dependency:
-2. Run Task 1:
-3. Run Task 2:
+Creates a ConnectionPool with a limited number of connections.
+Uses semaphores to ensure controlled access.
+Simulates multiple processes requesting and releasing database connections.
+4. Observations
+A. Square Program Results
+Multiprocessing significantly reduces execution time, especially for large datasets.
+Pool.map() and ProcessPoolExecutor are the most efficient.
+Sequential processing is the slowest.
+B. Connection Pool Results
+Semaphore ensures that only a fixed number of processes access connections at a time.
+Processes wait when the pool is full, preventing race conditions.
+5. Conclusion
+This assignment demonstrates how Python multiprocessing improves performance and how semaphores help manage shared resources safely.
 
-## Notes:
-- This version does not require MPI or mpi4py.
-- Runs locally using multiprocessing for compatibility on any system.

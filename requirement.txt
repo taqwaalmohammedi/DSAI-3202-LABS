@@ -1,1 +1,1 @@
-numpy
+python>=3.8
