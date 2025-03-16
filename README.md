@@ -1,44 +1,24 @@
-# lab 4 part 2
-# Brain Tumor Detection Using Parallel Processing
+README.md
+# DSAI 3202 - Lab 6: Parallel and Distributed Computing (Fallback Version)
 
-## Overview
-This project detects **brain tumors from MRI images** using **machine learning and parallel processing**. The main tasks include:
-- Loading and processing MRI images
-- Applying multiple image filters
-- Extracting texture features (GLCM)
-- Training machine learning models for classification
-- Evaluating model performance using accuracy, precision, recall, and F1-score
+## Group Members:
+- Dima (10.102.1.67)
+- Asma (10.102.0.)
+- Lena (10.102.0.)
 
-Parallel processing is used to speed up computations.
+## Description:
+This Lab 6 submission includes a fallback implementation of the two required tasks using Python's multiprocessing module instead of mpi4py, due to persistent environment issues.
 
+## Files Included:
+- calculate_squares_mp.py: Parallel square number calculator.
+- virus_simulation_mp.py: Parallel virus spread simulation.
+- requirements.txt: Minimal required dependency (numpy).
 
-# How to Run the Project
-python main.py 
+## How to Run:
+1. Install the dependency:
+2. Run Task 1:
+3. Run Task 2:
 
-# Install Required Libraries
-```bash
-pip install -r requirements.txt
-
-data/
-│── yes/   # Images with brain tumors
-│── no/    # Images without brain tumors
-
-#Parallel Processing Used
-Image Filtering – Using ProcessPoolExecutor
-Feature Extraction – Extracting GLCM features using multiprocessing
-Model Training – Training multiple machine learning models in parallel
-Machine Learning Models
-Random Forest Classifier
-Support Vector Machine (SVM)
-K-Nearest Neighbors (KNN)
-Best hyperparameters are selected using GridSearchCV.
-
-Model Evaluation
-Each model is evaluated based on:
-
-Accuracy
-Precision
-Recall
-F1-Score
-Confusion Matrix
-
+## Notes:
+- This version does not require MPI or mpi4py.
+- Runs locally using multiprocessing for compatibility on any system.
