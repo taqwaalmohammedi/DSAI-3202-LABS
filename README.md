@@ -2,7 +2,7 @@ README.md
 # DSAI 3202 - Lab 6: Parallel and Distributed Computing (Fallback Version)
 
 ## Group Members:
-- Dima (10.102.1.67)
+- Taqwa (10.102.1.67)
 - Asma (10.102.0.)
 - Lena (10.102.0.)
 
