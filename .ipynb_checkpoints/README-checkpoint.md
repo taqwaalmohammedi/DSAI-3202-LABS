@@ -1,60 +1,92 @@
-Introduction
-Parallel and distributed computing is essential for enhancing computational efficiency by utilizing multiple processors simultaneously. This report presents an implementation of multiprocessing and process synchronization in Python, leveraging the multiprocessing module to optimize execution time and manage shared resources safely.
+DSAI 3202 - Assignment 1 - Part 1 Report
 
-The assignment consists of two primary tasks:
+1. Introduction
 
-Square Computation using Multiprocessing
-Compare sequential execution with multiprocessing approaches.
-Evaluate execution time improvements using methods like apply_async, map(), and ProcessPoolExecutor.
-Process Synchronization using Semaphores
-Implement a Connection Pool that limits access to shared database connections.
-Utilize semaphores to regulate simultaneous access, preventing race conditions.
-The objective is to analyze performance enhancements when using parallel execution and understand synchronization techniques to manage limited resources efficiently.
+This report presents the results and observations of the process synchronization simulation and parallel computation using multiprocessing. The objective of this assignment was to implement a controlled database connection pool and evaluate the performance of different multiprocessing techniques for computing squares of large datasets.
 
-2. Objectives
-The primary objectives of this assignment are:
+2. Process Synchronization Simulation
 
-To implement parallel computation using Python’s multiprocessing capabilities.
-To compare different multiprocessing techniques and evaluate their efficiency.
-To use semaphores for managing concurrent access to shared resources.
-To analyze and interpret performance differences between sequential and parallel execution.
-3. Implementation
-3.1 Square Computation Using Multiprocessing
-This task involves computing the square of 1 million (10⁶) and 10 million (10⁷) numbers using multiple approaches:
+2.1 Description
 
-Sequential execution (traditional single-threaded computation).
-Multiprocessing using apply_async, map(), and apply().
-Process-based execution using ProcessPoolExecutor.
-Each method was tested and execution times were recorded for performance comparison.
+A database connection pool was implemented to allow multiple processes to access database connections in a controlled manner. The connection pool had a maximum of three available connections, but six processes attempted to access it simultaneously. A semaphore mechanism was used to ensure that only three processes could hold a connection at any given time.
 
-3.2 Process Synchronization Using Semaphores
-This task involves managing access to a limited resource pool (database connections) using semaphores.
+2.2 Observed Output
 
-A Connection Pool was implemented with a maximum number of allowed connections. When multiple processes request access:
+Starting Process Simulation...
+Process 0 is waiting for a connection...
+Process 0 acquired DB_Conn_2.
+Process 1 is waiting for a connection...
+Process 1 acquired DB_Conn_2.
+Process 2 is waiting for a connection...
+Process 2 acquired DB_Conn_2.
+Process 3 is waiting for a connection...
+Process 4 is waiting for a connection...
+Process 5 is waiting for a connection...
+Process 2 released DB_Conn_2.
+Process 3 acquired DB_Conn_2.
+Process 1 released DB_Conn_2.
+Process 4 acquired DB_Conn_2.
+Process 0 released DB_Conn_2.
+Process 5 acquired DB_Conn_2.
+Process 3 released DB_Conn_2.
+Process 5 released DB_Conn_2.
+Process 4 released DB_Conn_2.
 
-If connections are available, a process acquires a connection and performs a simulated operation.
-If no connections are available, the process waits until one is released.
-This ensures that only a fixed number of processes can access the resource at any given time.
-This method prevents race conditions and ensures smooth execution when multiple processes need shared resources.
+2.3 Analysis
 
-4. Results & Observations
-4.1 Square Computation Performance Analysis
-The execution times for different methods were recorded as follows:
+The simulation correctly enforces the limit of three simultaneous connections.
 
-Method              	Execution Time for 10⁶ numbers	       Execution Time for 10⁷ numbers
-Sequential Execution	          ~0.06s	                                ~0.61s
-Multiprocessing (apply_async)    	~40s	                                 ~387s
-Multiprocessing Pool (map)       	~0.24s                                	~1.7s
-ProcessPoolExecutor               	~109s	                                 Slow
-Key Observations:
-Sequential execution was the slowest due to single-threaded processing.
-Multiprocessing Pool (map()) was the fastest, efficiently distributing the workload across multiple CPU cores.
-ProcessPoolExecutor had higher overhead, making it slower than Pool.map().
-4.2 Process Synchronization Analysis
-The Connection Pool implementation demonstrated correct behavior in managing concurrent access. Key observations include:
+Processes beyond the limit must wait until an existing process releases a connection.
 
-Processes correctly waited when connections were unavailable, ensuring controlled access.
-The semaphore limited access to a fixed number of connections, preventing excessive simultaneous access.
-No race conditions occurred, confirming that synchronization was effectively enforced.
-5. Conclusion
-This assignment demonstrated that multiprocessing significantly improves execution speed for computationally intensive tasks. Additionally, semaphores play a crucial role in ensuring controlled access to shared resources, preventing conflicts and ensuring orderly execution.
+Connections appear to be labeled incorrectly (DB_Conn_2 is repeatedly assigned) rather than distinct labels (DB_Conn_1, DB_Conn_2, DB_Conn_3).
+
+The process execution order is not strictly sequential due to the randomized sleep time in each process.
+
+2.4 Recommendations
+
+Ensure unique connection identifiers when a process acquires a connection.
+
+Log which process acquires/releases which connection to improve traceability.
+
+3. Square Computation Tests
+
+3.1 Description
+
+The second part of the assignment evaluates different multiprocessing techniques to compute squares of numbers efficiently. Various methods were tested on datasets containing 10⁶ and 10⁷ random numbers.
+
+3.2 Observed Output
+
+Starting Square Computation Tests...
+Running tests for 10^6 numbers:
+Sequential Execution Time: 0.0675 seconds
+Multiprocessing Execution Time: 0.1733 seconds
+
+3.3 Analysis
+
+Sequential Execution is faster than Multiprocessing Execution for 10⁶ numbers.
+
+This contradicts expectations because multiprocessing is generally expected to improve performance.
+
+Possible causes:
+
+Process creation overhead: Multiprocessing has an initial overhead for creating new processes, making it inefficient for small workloads.
+
+I/O bottlenecks: If the multiprocessing approach involves excessive memory access or inter-process communication, it may slow down execution.
+
+3.4 Recommendations
+
+Perform tests on 10⁷ numbers to determine if multiprocessing becomes more efficient at a larger scale.
+
+Optimize multiprocessing techniques by:
+
+Using Pool.map instead of individual apply_async calls to minimize inter-process communication.
+
+Experimenting with concurrent.futures.ProcessPoolExecutor for better task distribution.
+
+4. Conclusion
+
+The process synchronization simulation correctly manages limited database connections but requires a fix for unique connection identifiers.
+
+Multiprocessing performance for square computation is currently slower than sequential execution, likely due to process creation overhead.
+
+Further optimizations are needed to improve multiprocessing efficiency, especially for larger datasets.

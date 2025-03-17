@@ -27,10 +27,10 @@ def access_database(pool, process_id):
     pool.release_connection(connection)
     print(f"Process {process_id} released {connection}.")
 
-# Main function to set up multiprocessing
-def main():
+# Function to run multiprocessing database access
+def run_process():
     max_connections = 3  # Limit the number of connections
-    pool = ConnectionPool(max_connections)  # FIXED: Pass max_connections argument
+    pool = ConnectionPool(max_connections)
 
     processes = []
     num_processes = 6  # More processes than connections
@@ -42,6 +42,3 @@ def main():
 
     for p in processes:
         p.join()
-
-if __name__ == "__main__":
-    main()
