@@ -5,16 +5,9 @@ from genetic_algorithms_functions import calculate_fitness, \
     select_in_tournament, order_crossover, mutate, \
     generate_unique_population
 
-# Get the absolute path to the data folder
-data_folder = os.path.join(os.path.dirname(__file__), "..", "data")
-distance_file = os.path.join(data_folder, "city_distances_extended.csv")
 
-# Load the distance matrix
-if not os.path.exists(distance_file):
-    print(f"Error: {distance_file} not found.")
-    exit(1)
-
-distance_matrix = pd.read_csv(distance_file).to_numpy()
+# Load the distance matrix from the 'src' folder
+distance_matrix = pd.read_csv("data/city_distances_extended.csv").to_numpy()
 
 # Parameters
 num_nodes = distance_matrix.shape[0]
@@ -29,15 +22,15 @@ stagnation_limit = 5
 np.random.seed(42)
 population = generate_unique_population(population_size, num_nodes)
 
-# Track stagnation
-best_fitness = float("inf")
+# Initialize variables for tracking stagnation
+best_fitness = int(1e6)
 stagnation_counter = 0
 
-# Genetic Algorithm loop
+# Main GA loop
 for generation in range(num_generations):
     fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
 
-    # Check for improvement
+    # Check for stagnation
     current_best_fitness = np.min(fitness_values)
     if current_best_fitness < best_fitness:
         best_fitness = current_best_fitness

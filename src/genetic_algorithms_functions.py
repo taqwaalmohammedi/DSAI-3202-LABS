@@ -1,4 +1,10 @@
+from mpi4py import MPI
 import numpy as np
+import time
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
 
 def calculate_fitness(route, distance_matrix):
     """
@@ -18,13 +24,12 @@ def calculate_fitness(route, distance_matrix):
         node1, node2 = route[i], route[i + 1]
         distance = distance_matrix[node1][node2]
 
-        # Adaptive penalty for infeasible routes
-        if distance == 100000:
-            total_distance += np.median(distance_matrix[distance_matrix < 100000]) * 2  # Softer penalty
+        if distance == 100000:  # Penalty for infeasible routes
+            total_distance += np.median(distance_matrix[distance_matrix < 100000]) * 2  
         else:
             total_distance += distance
 
-    return -total_distance  # Return negative value for GA optimization
+    return -total_distance  # Negative for minimization
 
 
 def select_in_tournament(population, scores, number_tournaments=12, tournament_size=8):
@@ -111,3 +116,61 @@ def generate_unique_population(population_size, num_nodes):
         individual = [0] + list(np.random.permutation(np.arange(1, num_nodes)))
         population.add(tuple(individual))
     return [list(ind) for ind in population]
+
+
+def run_genetic_algorithm(population, distance_matrix, num_generations, stagnation_limit):
+    """
+    Runs the genetic algorithm in parallel and measures execution time.
+
+    Parameters:
+    - population: The initial population
+    - distance_matrix: Distance matrix for calculating fitness
+    - num_generations: Number of generations
+    - stagnation_limit: Stagnation limit before regenerating population
+
+    Returns:
+    - Best solution and execution time
+    """
+    start_time = time.time()  # Start Timer
+
+    best_fitness = float("inf")
+    stagnation_counter = 0
+
+    for generation in range(num_generations):
+        fitness_values = np.array([calculate_fitness(route, distance_matrix) for route in population])
+
+        # Parallel processing: Scatter and Gather
+        local_population_size = len(population) // size
+        local_population = comm.scatter(population[:local_population_size * size], root=0)
+        local_fitness = np.array([calculate_fitness(route, distance_matrix) for route in local_population])
+        gathered_fitness = comm.gather(local_fitness, root=0)
+
+        if rank == 0:
+            fitness_values = np.concatenate(gathered_fitness)
+
+        current_best_fitness = np.min(fitness_values)
+        if current_best_fitness < best_fitness:
+            best_fitness = current_best_fitness
+            stagnation_counter = 0
+        else:
+            stagnation_counter += 1
+
+        if stagnation_counter >= stagnation_limit:
+            print(f"Regenerating population at generation {generation} due to stagnation")
+            best_individual = population[np.argmin(fitness_values)]
+            population = generate_unique_population(len(population) - 1, len(distance_matrix))
+            population.append(best_individual)
+            stagnation_counter = 0
+            continue
+
+        selected = select_in_tournament(population, fitness_values)
+        offspring = [mutate(order_crossover(selected[i], selected[i + 1]), 0.1) for i in range(0, len(selected), 2)]
+        population = offspring
+
+        print(f"Generation {generation}: Best fitness = {current_best_fitness}")
+
+    end_time = time.time()  # End Timer
+    execution_time = end_time - start_time
+
+    print(f"Execution Time: {execution_time:.2f} seconds")
+    return best_fitness, execution_time
