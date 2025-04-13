@@ -1,4 +1,0 @@
-python
-numpy
-pandas
-mpi4py
