@@ -22,14 +22,3 @@ If the explorer visited the same place three times in a row, it meant it was goi
 ### Code idea:
 - I used `self.move_history = deque(maxlen=3)`
 - Then `is_stuck()` checks if all 3 moves are the same.
-
-## results 
-
-
-=== Maze Static Optimized Path ===
-Total time taken: 0.000001 seconds
-Total moves made: 71
-==================================
-
-Maze solved in 0.000001 seconds
-Number of moves: 71
